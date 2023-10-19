@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
-from django import forms
+from django.utils.safestring import mark_safe
 
 
 class TiposExames(models.Model):
@@ -33,6 +33,16 @@ class SolicitacaoExame(models.Model):
 
     def __str__(self):
         return f'{self.usuario} | {self.exame.nome}'
+
+    def badge_template(self):
+        if self.status == 'E':
+            class_name = 'bg-warning'
+            text = 'Em análise'
+        else:
+            class_name = 'bg-success'
+            text = 'Finalizado'
+
+        return mark_safe(f'<span class="badge {class_name} text-dark">{text}</span>')
 
 
 class PedidosExames(models.Model):
