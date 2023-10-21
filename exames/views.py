@@ -85,3 +85,38 @@ def cancelar_pedido(request, pedido_id):
 def gerenciar_exames(request):
     exames = SolicitacaoExame.objects.filter(usuario=request.user)
     return render(request, 'gerenciar_exames.html', {'exames': exames})
+
+
+@login_required
+def permitir_abrir_exame(request, exame_id):
+    exame = SolicitacaoExame.objects.get(id=exame_id)
+
+    if not exame.requer_senha:
+        if not exame.resultado:
+            messages.add_message(request, constants.ERROR, 'Não há PDF.')
+            return redirect('/exames/gerenciar_exames')
+        else:
+            return redirect(exame.resultado.url)
+
+    return redirect(f'/exames/solicitar_senha_exame/{exame_id}')
+
+
+@login_required
+def solicitar_senha_exame(request, exame_id):
+    exame = SolicitacaoExame.objects.get(id=exame_id)
+
+    if request.method == "GET":
+        return render(request, 'solicitar_senha_exame.html', {'exame': exame})
+
+    elif request.method == "POST":
+        senha = request.POST.get("senha")
+        if exame.usuario == request.user:
+            if senha == exame.senha:
+                return redirect(exame.resultado.url)
+            else:
+                messages.add_message(
+                    request, constants.ERROR, 'Senha inválida')
+                return redirect(f'/exames/solicitar_senha_exame/{exame.id}')
+        else:
+            messages.add_message(request, constants.ERROR, 'Usuario inválida')
+            return redirect(f'/exames/solicitar_senha_exame/{exame.id}')
