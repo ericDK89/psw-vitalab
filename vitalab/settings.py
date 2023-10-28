@@ -29,7 +29,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.humanize',
     'usuarios',
-    'exames'
+    'exames',
+    'empresarial'
 ]
 
 MIDDLEWARE = [
